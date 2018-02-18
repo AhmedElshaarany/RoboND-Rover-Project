@@ -105,6 +105,7 @@ def create_output_images(Rover):
                   # sample on the map
                   if np.min(rock_sample_dists) < 3:
                         samples_located += 1
+                        Rover.samples_located = samples_located
                         map_add[test_rock_y-rock_size:test_rock_y+rock_size, 
                         test_rock_x-rock_size:test_rock_x+rock_size, :] = 255
 
