@@ -8,47 +8,23 @@
 
 This project is modeled after the [NASA sample return challenge](https://www.nasa.gov/directorates/spacetech/centennial_challenges/sample_return_robot/index.html) and it will give you first hand experience with the three essential elements of robotics, which are perception, decision making and actuation.  You will carry out this project in a simulator environment built with the Unity game engine.  
 
-## The Simulator
-The first step is to download the simulator build that's appropriate for your operating system.  Here are the links for [Linux](https://s3-us-west-1.amazonaws.com/udacity-robotics/Rover+Unity+Sims/Linux_Roversim.zip), [Mac](	https://s3-us-west-1.amazonaws.com/udacity-robotics/Rover+Unity+Sims/Mac_Roversim.zip), or [Windows](https://s3-us-west-1.amazonaws.com/udacity-robotics/Rover+Unity+Sims/Windows_Roversim.zip).  
-
-You can test out the simulator by opening it up and choosing "Training Mode".  Use the mouse or keyboard to navigate around the environment and see how it looks.
-
-## Dependencies
-You'll need Python 3 and Jupyter Notebooks installed to do this project.  The best way to get setup with these if you are not already is to use Anaconda following along with the [RoboND-Python-Starterkit](https://github.com/ryan-keenan/RoboND-Python-Starterkit). 
+## Obstacle and Rock Sample Identification
+To identify obstacles, the color\_thresh function in perception.py was modified to consider all pixels that do not meet the color threshold as obstacles  (lines 14 and 23) and return that map to the perception\_step method.
+To identify rock samples, a rock\_extractor method was defined in perception.py that color thresholds the color yellow and returns that locations of such pixels (lines 27-33) similar to the technique used [here] (http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_colorspaces/py_colorspaces.html). An example on how the rock\_extarctor method was used is shown in code-cell 12 in the jupyter notebook.
 
 
-Here is a great link for learning more about [Anaconda and Jupyter Notebooks](https://classroom.udacity.com/courses/ud1111)
+## process_image() method
+This method is responsible for to analyze images and create a worldmap. The method is implemented in code-cell 9 in the jupyter notebook.
+The first step was to determine the source and destination points to be apply perspective transform. The grid in the simulator was used to determine the source points, and the destination points represent a 10x10 pixel square.
+After the perspective transform is applied, the color\_thresh and rock\_extractor methods are used to determine the locations of navigable terrain, obstacles, and rock samples.
+Afterwards, the thresholded images are converted to robot-concentric coordinates, which are then rotated and translated to map the pixels in world coordinates.
+A video in th output folder shows how the process_image() analyzes the images and creates the worldmap.
 
-## Recording Data
-I've saved some test data for you in the folder called `test_dataset`.  In that folder you'll find a csv file with the output data for steering, throttle position etc. and the pathnames to the images recorded in each run.  I've also saved a few images in the folder called `calibration_images` to do some of the initial calibration steps with.  
+## perception_step() and decision_step() methods
+The perception_step() method in perception.py is an enhanced version of the process\_image() method defined in the jupyter notebook. The perception\_step() method does the same functionalities as process\_image() in addition to filtering images that are valid for mapping based on setting thresholds near zero in roll and pitch. It also calculates the navigable distances and angles to feed the decision\_step() to help the rover move. Moreover, it calculates the distance and angle of detected rock samples to feed them to the decision\_step() and help the rover collect the rock sample.
+The decision\_step() in decision.py is the brain of the rover. It includes a few conditions to check the current state of the rover, and take actions accordingly. The code is commented to explain the different conditions and the rationale behind each step.
 
-The first step of this project is to record data on your own.  To do this, you should first create a new folder to store the image data in.  Then launch the simulator and choose "Training Mode" then hit "r".  Navigate to the directory you want to store data in, select it, and then drive around collecting data.  Hit "r" again to stop data collection.
 
-## Data Analysis
-Included in the IPython notebook called `Rover_Project_Test_Notebook.ipynb` are the functions from the lesson for performing the various steps of this project.  The notebook should function as is without need for modification at this point.  To see what's in the notebook and execute the code there, start the jupyter notebook server at the command line like this:
-
-```sh
-jupyter notebook
-```
-
-This command will bring up a browser window in the current directory where you can navigate to wherever `Rover_Project_Test_Notebook.ipynb` is and select it.  Run the cells in the notebook from top to bottom to see the various data analysis steps.  
-
-The last two cells in the notebook are for running the analysis on a folder of test images to create a map of the simulator environment and write the output to a video.  These cells should run as-is and save a video called `test_mapping.mp4` to the `output` folder.  This should give you an idea of how to go about modifying the `process_image()` function to perform mapping on your data.  
-
-## Navigating Autonomously
-The file called `drive_rover.py` is what you will use to navigate the environment in autonomous mode.  This script calls functions from within `perception.py` and `decision.py`.  The functions defined in the IPython notebook are all included in`perception.py` and it's your job to fill in the function called `perception_step()` with the appropriate processing steps and update the rover map. `decision.py` includes another function called `decision_step()`, which includes an example of a conditional statement you could use to navigate autonomously.  Here you should implement other conditionals to make driving decisions based on the rover's state and the results of the `perception_step()` analysis.
-
-`drive_rover.py` should work as is if you have all the required Python packages installed. Call it at the command line like this: 
-
-```sh
-python drive_rover.py
-```  
-
-Then launch the simulator and choose "Autonomous Mode".  The rover should drive itself now!  It doesn't drive that well yet, but it's your job to make it better!  
-
-**Note: running the simulator with different choices of resolution and graphics quality may produce different results!  Make a note of your simulator settings in your writeup when you submit the project.**
-
-### Project Walkthrough
-If you're struggling to get started on this project, or just want some help getting your code up to the minimum standards for a passing submission, we've recorded a walkthrough of the basic implementation for you but **spoiler alert: this [Project Walkthrough Video](https://www.youtube.com/watch?v=oJA6QHDPdQw) contains a basic solution to the project!**.
-
+## <span style="color:red">NOTE</span>
+The collect\_rocks state parameter in drive_rover.py is set to True by default. This allows the rover to collect samples if they are located. The collection algorithm fails in some cases, like when two samples are located in the same image. In order to disable rock sample collection and have a code that meets the fidelity and mapped percentage requirements, one can set the collect\_rocks parameter to False.
 

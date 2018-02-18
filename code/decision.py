@@ -23,7 +23,6 @@ def decision_step(Rover):
                 Rover.brake = Rover.brake_set
                 Rover.steer = 0
                 Rover.mode = 'stop'
-                Rover.current_rock_angle = Rover.angle_to_nearest_rock
             # Check the extent of navigable terrain
             if len(Rover.nav_angles) >= Rover.stop_forward:  
                 # If mode is forward, navigable terrain looks good 
@@ -47,15 +46,13 @@ def decision_step(Rover):
 
         # If we're already in "stop" mode then make different decisions
         elif Rover.mode == 'stop':
-            #if Rover.samples_located - Rover.samples_collected == 1 :
+            # check if a sample is located
             if Rover.samples_located > Rover.samples_collected and not np.isnan(Rover.angle_to_nearest_rock) and Rover.collect_rocks:
+                # stop and move to 'rotate_to_rock'
                 Rover.throttle = 0
                 Rover.brake = Rover.brake_set
                 # Rover.steer = 0
-                Rover.mode = 'rotate_to_rock'
-                
-                #Rover.distance_to_nearest_rock = mean_dist_rock
-                #Rover.angle_to_nearest_rock = mean_angle_rock
+                Rover.mode = 'rotate_to_rock'                
             # If we're in stop mode but still moving keep braking
             elif Rover.vel > 0.2:
                 Rover.throttle = 0
@@ -81,13 +78,14 @@ def decision_step(Rover):
                     Rover.mode = 'forward'
 
         # if a rock is found, steer the rover towards it
-        # elif Rover.mode == 'rotate_to_rock':
         elif Rover.mode == 'rotate_to_rock' and not np.isnan(Rover.angle_to_nearest_rock):
             # If we're in stop mode but still moving keep braking
             if Rover.vel > 0.2:
                 Rover.throttle = 0
                 Rover.brake = Rover.brake_set
                 Rover.steer = 0
+            # make sure that rock falls within angle threshold to be able to pick the rock
+            # by steering to allgin rover with sample
             elif abs(Rover.angle_to_nearest_rock) < ANGLE_THRESH:
                 Rover.throttle = 0
                 Rover.brake = Rover.brake_set
@@ -108,6 +106,7 @@ def decision_step(Rover):
             Rover.throttle = Rover.throttle_set
             Rover.brake = 0
             Rover.steer = 0
+            # steer if not alligned with rock sample
             if Rover.angle_to_nearest_rock > ANGLE_THRESH:
                 Rover.steer = 5
                 Rover.brake = 0
@@ -115,11 +114,11 @@ def decision_step(Rover):
                 Rover.steer = -5
                 Rover.brake = 0
             
-    # Just to make the rover do something 
-    # even if no modifications have been made to the code
         else:
             Rover.mode = 'forward'
-    
+
+    # Just to make the rover do something 
+    # even if no modifications have been made to the code
     else:
         Rover.throttle = Rover.throttle_set
         Rover.steer = 0
