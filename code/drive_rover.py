@@ -82,7 +82,7 @@ class RoverState():
         self.distance_to_nearest_rock = None
         self.angle_to_nearest_rock = None
         self.current_rock_angle = None
-        self.collect_rocks = False
+        self.collect_rocks = True
 # Initialize our rover 
 Rover = RoverState()
 

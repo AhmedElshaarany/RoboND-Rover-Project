@@ -165,9 +165,7 @@ def perception_step(Rover):
     rock_dist, rock_angles = to_polar_coords(xpix_rock, ypix_rock)
     mean_dist_rock = np.mean(rock_dist)
     mean_angle_rock = np.mean(rock_angles)
-    print("Mean Rock Dist = " + str(mean_dist_rock))
-    print("Mean Rock Angle = " + str(mean_angle_rock))
-    if not np.isnan(mean_dist_rock):
+    if not np.isnan(mean_dist_rock) and not np.isnan(mean_angle_rock):
         Rover.distance_to_nearest_rock = mean_dist_rock
         Rover.angle_to_nearest_rock = mean_angle_rock
     

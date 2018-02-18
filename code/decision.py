@@ -93,19 +93,15 @@ def decision_step(Rover):
                 Rover.brake = Rover.brake_set
                 Rover.steer = 0
                 Rover.mode = 'move_towards_rock'
-                print("Move to move_towards_rock_state")
             elif Rover.angle_to_nearest_rock > ANGLE_THRESH:
                 Rover.steer = 5
                 Rover.brake = 0
-                print("Steer pos")
             elif Rover.angle_to_nearest_rock < -ANGLE_THRESH:
                 Rover.steer = -5
                 Rover.brake = 0
-                print("Steer neg")
 
         # if aiming towards rock, move forward
         elif Rover.mode == 'move_towards_rock' and not np.isnan(Rover.angle_to_nearest_rock):
-            print("In move_towards_rock state")
             Rover.throttle = 0
             Rover.brake = Rover.brake_set
             Rover.steer = 0
@@ -115,12 +111,9 @@ def decision_step(Rover):
             if Rover.angle_to_nearest_rock > ANGLE_THRESH:
                 Rover.steer = 5
                 Rover.brake = 0
-                print("Steer pos")
             elif Rover.angle_to_nearest_rock < -ANGLE_THRESH:
                 Rover.steer = -5
                 Rover.brake = 0
-                print("Steer neg")
-            print("Moving towards rock")
             
     # Just to make the rover do something 
     # even if no modifications have been made to the code
@@ -133,12 +126,12 @@ def decision_step(Rover):
         Rover.brake = 0
         
     # If in a state where want to pickup a rock send pickup command
-    if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up:
+    if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up and Rover.collect_rocks:
         Rover.send_pickup = True
         Rover.mode = 'stop'
 
     # If near sample, then stop to be able to pick up
-    if Rover.near_sample:
+    if Rover.near_sample and Rover.collect_rocks:
         # Set mode to "stop" and hit the brakes!
         Rover.throttle = 0
         # Set brake to stored brake value
